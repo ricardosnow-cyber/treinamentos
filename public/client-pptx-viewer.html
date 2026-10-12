@@ -3,172 +3,459 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Studio IA de Treinamentos — Visualizador PPTX</title>
+  <title>Studio IA de Treinamentos</title>
   <style>
-    :root{--bg:#f5f7fb;--card:#fff;--muted:#6b7280;--primary:#2563eb;--accent:#0f172a}
-    body{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;margin:0;background:var(--bg);color:var(--accent)}
-    .container{max-width:1024px;margin:28px auto;padding:18px}
-    header{display:flex;align-items:center;justify-content:space-between}
-    h1{font-size:1.25rem;margin:0}
-    .layout{display:grid;grid-template-columns:320px 1fr;gap:18px;margin-top:16px}
-    .card{background:var(--card);padding:14px;border-radius:8px;box-shadow:0 1px 2px rgba(2,6,23,0.06)}
-    label{display:block;font-size:0.85rem;color:var(--muted);margin-bottom:6px}
-    input[type=text],select,input[type=file]{width:100%;padding:8px;border:1px solid #e6eef8;border-radius:6px}
-    .btn{display:inline-block;background:var(--primary);color:#fff;padding:8px 12px;border-radius:6px;border:none;cursor:pointer}
-    .btn.secondary{background:#374151}
-    .controls{display:flex;gap:8px;flex-wrap:wrap}
-    .slides{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:12px}
-    .slide{background:#fff;border:1px solid #eef2ff;padding:10px;border-radius:8px}
-    .thumb{height:140px;background:#f8fafc;display:flex;align-items:center;justify-content:center;margin-bottom:8px;overflow:hidden}
-    pre{white-space:pre-wrap;font-size:0.85rem;background:#f8fafc;padding:8px;border-radius:6px;border:1px solid #f1f5f9}
-    .muted{color:var(--muted);font-size:0.9rem}
-    footer{margin-top:18px;color:var(--muted);font-size:0.85rem}
-    .row{display:flex;gap:8px}
+    :root {
+      --bg: #f4f6fb;
+      --panel: #ffffff;
+      --panel-alt: #f8fafc;
+      --line: #e5e7eb;
+      --text: #111827;
+      --muted: #6b7280;
+      --primary: #2f80ed;
+      --primary-dark: #1f6fe5;
+      --secondary: #e5e7eb;
+      --secondary-text: #111827;
+      --shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    .top {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 22px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .top h1 {
+      margin: 0;
+      font-size: clamp(2rem, 3vw, 3rem);
+      line-height: 1.1;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+    }
+
+    .top p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 1.08rem;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 0.8rem 1.15rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn.primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 10px 20px rgba(47, 128, 237, 0.2);
+    }
+
+    .btn.primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn.secondary {
+      background: var(--secondary);
+      color: var(--secondary-text);
+    }
+
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 10px 22px 32px;
+      display: grid;
+      grid-template-columns: minmax(320px, 1fr) minmax(0, 1.55fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .card h2 {
+      margin: 0 0 18px;
+      font-size: 1.7rem;
+      letter-spacing: -0.03em;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px 18px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .field label {
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .field input[type="text"],
+    .field input[type="file"] {
+      width: 100%;
+      min-height: 42px;
+      padding: 0.7rem 0.8rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: var(--text);
+      font: inherit;
+    }
+
+    .field input[type="file"] {
+      padding: 0.75rem 0.8rem;
+      background: var(--panel-alt);
+    }
+
+    .actions {
+      margin-top: 18px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .status {
+      margin-top: 16px;
+      min-height: 22px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .result-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 100%;
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 10px;
+    }
+
+    .result-header h3 {
+      margin: 0;
+      font-size: 1.5rem;
+      letter-spacing: -0.03em;
+    }
+
+    .result-header .muted {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-top: 5px;
+    }
+
+    .slides {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(225px, 1fr));
+      gap: 16px;
+    }
+
+    .slide {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .thumb {
+      width: 100%;
+      height: 150px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: linear-gradient(135deg, #eef5ff, #f8fafc);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .slide strong {
+      display: block;
+      font-size: 0.95rem;
+      line-height: 1.35;
+      margin-bottom: 6px;
+    }
+
+    .slide pre {
+      margin: 0;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: var(--panel-alt);
+      border: 1px solid var(--line);
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: var(--text);
+      font-size: 0.8rem;
+      line-height: 1.55;
+      font-family: inherit;
+    }
+
+    .notes {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .notes strong {
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    @media (max-width: 860px) {
+      .wrap {
+        grid-template-columns: 1fr;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .top {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div>
-        <h1>Studio IA de Treinamentos — Visualizador PPTX</h1>
-        <div class="muted">Versão cliente — roda no navegador. Integração com backend opcional.</div>
-      </div>
-      <div class="controls">
-        <button id="processLocal" class="btn">Processar local</button>
-        <button id="uploadServer" class="btn secondary">Enviar ao servidor</button>
-      </div>
-    </header>
+  <header class="top">
+    <div>
+      <h1>Studio IA de Treinamentos</h1>
+      <p>Processamento real de arquivos PPTX</p>
+    </div>
+    <button id="newTraining" class="btn secondary" type="button">Novo treinamento</button>
+  </header>
 
-    <div class="layout">
-      <aside class="card">
-        <form id="form">
-          <div style="margin-bottom:10px">
+  <main class="wrap">
+    <section class="card">
+      <h2>Novo treinamento</h2>
+
+      <form id="form">
+        <div class="grid">
+          <div class="field">
             <label>Nome do treinamento</label>
-            <input name="name" id="name" type="text" value="Reciclagem Operação Segura" required />
+            <input id="name" name="name" type="text" value="Reciclagem Operação Segura" />
           </div>
-          <div style="margin-bottom:10px">
-            <label>Unidade</label>
-            <input name="unit" id="unit" type="text" value="CD-SP" />
+
+          <div class="field">
+            <label>Empresa ou unidade</label>
+            <input id="unit" name="unit" type="text" value="CD-SP" />
           </div>
-          <div style="margin-bottom:10px">
+
+          <div class="field">
             <label>Categoria</label>
-            <input name="category" id="category" type="text" value="Segurança e Saúde no Trabalho" />
+            <input id="category" name="category" type="text" value="Segurança e Saúde no Trabalho" />
           </div>
-          <div style="margin-bottom:10px">
+
+          <div class="field">
             <label>Público-alvo</label>
-            <input name="audience" id="audience" type="text" value="Operadores de equipamentos" />
+            <input id="audience" name="audience" type="text" value="Operadores de equipamentos" />
           </div>
-          <div style="margin-bottom:10px">
+
+          <div class="field">
             <label>Avatar</label>
-            <input name="avatar" id="avatar" type="text" placeholder="Instrutor corporativo" />
+            <input id="avatar" name="avatar" type="text" placeholder="Instrutor corporativo" />
           </div>
-          <div style="margin-bottom:10px">
+
+          <div class="field">
             <label>Voz</label>
-            <input name="voice" id="voice" type="text" placeholder="Português BR didática" />
+            <input id="voice" name="voice" type="text" placeholder="Português BR didática" />
           </div>
-          <div style="margin-bottom:10px">
+
+          <div class="field">
             <label>Proporção do vídeo</label>
-            <input name="aspectRatio" id="aspectRatio" type="text" value="16:9" />
+            <input id="aspectRatio" name="aspectRatio" type="text" value="16:9" />
           </div>
-          <div style="margin-bottom:10px">
+
+          <div class="field">
+            <label>Duração máxima por vídeo</label>
+            <input id="duration" name="duration" type="text" placeholder="Ex.: 90s" />
+          </div>
+
+          <div class="field">
+            <label>Quantidade de vídeos</label>
+            <input id="videoCount" name="videoCount" type="text" placeholder="Ex.: 12" />
+          </div>
+
+          <div class="field">
             <label>Arquivo PPTX</label>
-            <input name="pptx" id="pptx" type="file" accept=".pptx" />
-          </div>
-          <div style="margin-bottom:10px">
-            <label>Logotipo (opcional)</label>
-            <input name="logo" id="logo" type="file" accept="image/*" />
-          </div>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button type="button" id="btnProcessLocal" class="btn">Processar local</button>
-            <button type="button" id="btnUploadServer" class="btn secondary">Enviar ao servidor</button>
-          </div>
-        </form>
-        <div id="status" class="muted" style="margin-top:10px">Aguardando ação</div>
-      </aside>
-
-      <section>
-        <div class="card">
-          <div class="row" style="align-items:center;justify-content:space-between">
-            <div>
-              <strong id="projectTitle">Nenhum arquivo</strong>
-              <div id="projectSummary" class="muted">Use o formulário à esquerda para selecionar um PPTX.</div>
-            </div>
-            <div>
-              <button id="downloadJson" class="btn" disabled>Baixar JSON</button>
-            </div>
+            <input id="pptx" name="pptx" type="file" accept=".pptx" />
           </div>
 
-          <div id="slides" class="slides" style="margin-top:12px"></div>
+          <div class="field">
+            <label>Logotipo</label>
+            <input id="logo" name="logo" type="file" accept="image/*" />
+          </div>
         </div>
 
-        <footer>
-          <div>Notas: processador local extrai texto, notas e imagens (miniaturas). Se o backend estiver disponível em <code>/api/projects</code>, use “Enviar ao servidor” para armazenar.</div>
-        </footer>
-      </section>
-    </div>
-  </div>
+        <div class="actions">
+          <button id="btnProcessLocal" class="btn primary" type="button">Processar PPTX</button>
+          <button id="btnUploadServer" class="btn secondary" type="button">Enviar ao servidor</button>
+        </div>
+      </form>
 
-  <!-- Dependências via CDN -->
+      <div id="status" class="status">Aguardando arquivo .pptx</div>
+    </section>
+
+    <section id="result" class="card result-panel" aria-live="polite">
+      <div class="result-header">
+        <div>
+          <h3 id="projectTitle">Nenhum projeto</h3>
+          <div id="summary" class="muted">Selecione um arquivo PPTX para iniciar a extração.</div>
+        </div>
+        <button id="downloadJson" class="btn primary" type="button" disabled>Baixar JSON</button>
+      </div>
+
+      <div id="slides" class="slides"></div>
+    </section>
+  </main>
+
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fast-xml-parser@4.5.0/dist/fast-xml-parser.min.js"></script>
 
   <script>
-    // Elements
     const form = document.getElementById('form');
-    const pptxInput = document.getElementById('pptx');
-    const logoInput = document.getElementById('logo');
     const statusEl = document.getElementById('status');
     const slidesEl = document.getElementById('slides');
     const projectTitle = document.getElementById('projectTitle');
-    const projectSummary = document.getElementById('projectSummary');
+    const summaryEl = document.getElementById('summary');
     const downloadJson = document.getElementById('downloadJson');
+    const pptxInput = document.getElementById('pptx');
+    const logoInput = document.getElementById('logo');
     const btnProcessLocal = document.getElementById('btnProcessLocal');
     const btnUploadServer = document.getElementById('btnUploadServer');
+    const newTrainingBtn = document.getElementById('newTraining');
 
-    // small helpers
-    const arrayWrap = v => v == null ? [] : Array.isArray(v) ? v : [v];
+    const arrayWrap = value => value == null ? [] : Array.isArray(value) ? value : [value];
+
     const detectMime = (name) => {
       const ext = (name || '').split('.').pop().toLowerCase();
-      return { png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',gif:'image/gif',bmp:'image/bmp',svg:'image/svg+xml',webp:'image/webp' }[ext] || 'application/octet-stream';
+      return {
+        png: 'image/png',
+        jpg: 'image/jpeg',
+        jpeg: 'image/jpeg',
+        gif: 'image/gif',
+        bmp: 'image/bmp',
+        svg: 'image/svg+xml',
+        webp: 'image/webp'
+      }[ext] || 'application/octet-stream';
     };
 
-    function escapeHtml(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[c]); }
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, c => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      })[c]);
+    }
 
-    function extractTexts(obj, out = []){
+    function extractTexts(obj, out = []) {
       if (obj == null) return out;
-      if (Array.isArray(obj)) { obj.forEach(i => extractTexts(i, out)); return out; }
+      if (Array.isArray(obj)) {
+        obj.forEach(item => extractTexts(item, out));
+        return out;
+      }
       if (typeof obj !== 'object') return out;
-      for (const [k,v] of Object.entries(obj)){
-        if (k === 'a:t' || k.endsWith(':t')) arrayWrap(v).forEach(i => out.push(String(i)));
-        else extractTexts(v, out);
+      for (const [key, value] of Object.entries(obj)) {
+        if (key === 'a:t' || key.endsWith(':t')) {
+          arrayWrap(value).forEach(item => out.push(String(item)));
+        } else {
+          extractTexts(value, out);
+        }
       }
       return out;
     }
 
-    function normalizeZipPath(base, target){
+    function normalizeZipPath(base, target) {
       if (!target) return '';
-      let t = decodeURIComponent(String(target)).replace(/\\/g,'/').replace(/^\//,'');
-      if (t.startsWith('ppt/')) return t;
-      return base.replace(/\/$/,'') + '/' + t;
+      let clean = decodeURIComponent(String(target)).replace(/\\/g, '/').replace(/^\//, '');
+      if (clean.startsWith('ppt/')) return clean;
+      return base.replace(/\/$/, '') + '/' + clean;
     }
 
-    async function parsePptxFile(file){
-      statusEl.textContent = 'Lendo arquivo...';
+    async function parsePptxFile(file) {
       const buffer = await file.arrayBuffer();
       const zip = await JSZip.loadAsync(buffer);
       const names = Object.keys(zip.files);
-      const slideFiles = names.filter(n => /^ppt\/slides\/slide\d+\.xml$/.test(n)).sort((a,b)=>{const na=Number(a.match(/slide(\d+)/)?.[1]||0);const nb=Number(b.match(/slide(\d+)/)?.[1]||0);return na-nb});
-      if (!slideFiles.length) throw new Error('Nenhum slide encontrado');
+      const slideFiles = names.filter(name => /^ppt\/slides\/slide\d+\.xml$/.test(name))
+        .sort((a, b) => {
+          const na = Number(a.match(/slide(\d+)/)?.[1] || 0);
+          const nb = Number(b.match(/slide(\d+)/)?.[1] || 0);
+          return na - nb;
+        });
+
+      if (!slideFiles.length) throw new Error('Nenhum slide foi encontrado no arquivo PPTX.');
 
       const XMLParser = window.fastXmlParser?.XMLParser || window.XMLParser;
-      const parser = new XMLParser({ ignoreAttributes:false, attributeNamePrefix:'', trimValues:false });
+      const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '', trimValues: false });
 
       const slides = [];
-      for (const slideFile of slideFiles){
-        const number = Number(slideFile.match(/slide(\d+)/)?.[1]||0);
+
+      for (const slideFile of slideFiles) {
+        const number = Number(slideFile.match(/slide(\d+)/)?.[1] || 0);
         const slideXml = await zip.file(slideFile).async('string');
         const slideDoc = parser.parse(slideXml || '');
-        const paragraphs = extractTexts(slideDoc).map(t => t.replace(/\s+/g,' ').trim()).filter(Boolean);
+        const paragraphs = extractTexts(slideDoc)
+          .map(text => text.replace(/\s+/g, ' ').trim())
+          .filter(Boolean);
 
         const baseName = slideFile.split('/').pop();
         const relPath = `ppt/slides/_rels/${baseName}.rels`;
@@ -177,80 +464,155 @@
         const relationships = arrayWrap(relDoc.Relationships?.Relationship);
 
         const images = [];
-        for (const rel of relationships){
-          if (!String(rel.Type||'').endsWith('/image')) continue;
+        for (const rel of relationships) {
+          if (!String(rel.Type || '').endsWith('/image')) continue;
           if (rel.TargetMode === 'External') continue;
           const target = normalizeZipPath('ppt/slides', rel.Target);
           const imgFile = zip.file(target);
           if (!imgFile) continue;
-          const arr = await imgFile.async('arraybuffer');
-          const blob = new Blob([arr], { type: detectMime(target) });
+          const arrayBuffer = await imgFile.async('arraybuffer');
+          const blob = new Blob([arrayBuffer], { type: detectMime(target) });
           const url = URL.createObjectURL(blob);
-          images.push({ path:target, url, mime: detectMime(target) });
+          images.push({ path: target, url, mime: detectMime(target) });
         }
 
         let notes = '';
-        const notesRel = relationships.find(r => String(r.Type||'').endsWith('/notesSlide'));
-        if (notesRel?.Target){
-          try{
+        const notesRel = relationships.find(r => String(r.Type || '').endsWith('/notesSlide'));
+        if (notesRel?.Target) {
+          try {
             const notesPath = normalizeZipPath('ppt/slides', notesRel.Target);
             const notesXml = zip.file(notesPath) ? await zip.file(notesPath).async('string') : null;
-            if (notesXml){ const notesDoc = parser.parse(notesXml); notes = extractTexts(notesDoc).map(t=>t.replace(/\s+/g,' ').trim()).filter(Boolean).join(' '); }
-          }catch(e){ /* ignore */ }
+            if (notesXml) {
+              const notesDoc = parser.parse(notesXml);
+              notes = extractTexts(notesDoc)
+                .map(text => text.replace(/\s+/g, ' ').trim())
+                .filter(Boolean)
+                .join(' ');
+            }
+          } catch (error) {
+            // ignora erro de notas
+          }
         }
 
-        slides.push({ number, title: paragraphs[0] || `Slide ${number}`, text: paragraphs.join(' '), notes, images });
+        slides.push({
+          number,
+          title: paragraphs[0] || `Slide ${number}`,
+          text: paragraphs.join(' '),
+          notes,
+          images
+        });
       }
+
       return { slides, slideCount: slides.length };
     }
 
-    function renderProject(fileName, result){
+    function renderProject(fileName, result) {
       projectTitle.textContent = fileName;
-      projectSummary.textContent = `${result.slideCount} slides — visualização local`;
+      summaryEl.textContent = `${result.slideCount} slides processados`;
       slidesEl.innerHTML = '';
-      for (const s of result.slides){
-        const el = document.createElement('article'); el.className='slide';
-        el.innerHTML = `<div class="thumb">${s.images[0] ? `<img src="${s.images[0].url}" alt="Slide ${s.number}"/>` : '<span class="muted">Sem imagem</span>'}</div><div style="font-weight:600;margin-bottom:6px">${escapeHtml(s.title)}</div><div><pre>${escapeHtml(s.text||'[sem texto]')}</pre></div>${s.notes?`<div style="margin-top:8px"><strong>Notas:</strong><pre>${escapeHtml(s.notes)}</pre></div>`:''}`;
-        slidesEl.appendChild(el);
+
+      for (const slide of result.slides) {
+        const article = document.createElement('article');
+        article.className = 'slide';
+        article.innerHTML = `
+          <div class="thumb">
+            ${slide.images[0] ? `<img src="${slide.images[0].url}" alt="Slide ${slide.number}">` : 'Sem imagem'}
+          </div>
+          <div>
+            <strong>${escapeHtml(slide.title)}</strong>
+            <pre>${escapeHtml(slide.text || '[sem texto]')}</pre>
+            ${slide.notes ? `<div class="notes"><strong>Notas:</strong><pre>${escapeHtml(slide.notes)}</pre></div>` : ''}
+          </div>
+        `;
+        slidesEl.appendChild(article);
       }
+
       downloadJson.disabled = false;
-      downloadJson._data = { fileName: fileName.replace(/\.pptx$/i,'') + '.json', content: { file: fileName, slides: result.slides } };
+      downloadJson._data = {
+        fileName: fileName.replace(/\.pptx$/i, '') + '.json',
+        content: { file: fileName, slides: result.slides }
+      };
     }
 
-    // Buttons
-    document.getElementById('btnProcessLocal').addEventListener('click', async ()=>{
-      const f = pptxInput.files && pptxInput.files[0];
-      if (!f){ statusEl.textContent='Selecione um arquivo PPTX.'; return; }
-      try{ statusEl.textContent='Processando localmente...'; const res = await parsePptxFile(f); renderProject(f.name, res); statusEl.textContent='Concluído (local)'; }
-      catch(err){ console.error(err); statusEl.textContent='Erro: '+(err.message||err); }
+    async function processLocalHandler() {
+      const file = pptxInput.files && pptxInput.files[0];
+      if (!file) {
+        statusEl.textContent = 'Selecione um arquivo PPTX.';
+        return;
+      }
+
+      try {
+        statusEl.textContent = 'Processando arquivo...';
+        const result = await parsePptxFile(file);
+        renderProject(file.name, result);
+        statusEl.textContent = `Concluído: ${result.slideCount} slides extraídos.`;
+      } catch (error) {
+        console.error(error);
+        statusEl.textContent = 'Erro: ' + (error.message || error);
+      }
+    }
+
+    async function sendToServerHandler() {
+      const file = pptxInput.files && pptxInput.files[0];
+      if (!file) {
+        statusEl.textContent = 'Selecione um arquivo PPTX antes de enviar.';
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('pptx', file, file.name);
+
+      const logo = logoInput.files && logoInput.files[0];
+      if (logo) formData.append('logo', logo, logo.name);
+
+      ['name', 'unit', 'category', 'audience', 'avatar', 'voice', 'aspectRatio'].forEach(key => {
+        formData.append(key, form.elements[key].value || '');
+      });
+
+      try {
+        statusEl.textContent = 'Enviando ao servidor...';
+        const response = await fetch('/api/projects', { method: 'POST', body: formData });
+        if (!response.ok) {
+          throw new Error(`Servidor respondeu ${response.status}`);
+        }
+
+        const project = await response.json();
+        statusEl.textContent = `Projeto enviado e salvo com sucesso (id: ${project.id}).`;
+        renderProject(project.source?.filename || file.name, {
+          slides: project.slides || [],
+          slideCount: project.slideCount || (project.slides ? project.slides.length : 0)
+        });
+      } catch (error) {
+        console.error(error);
+        statusEl.textContent = 'Falha ao enviar ao servidor: ' + (error.message || error);
+      }
+    }
+
+    btnProcessLocal.addEventListener('click', processLocalHandler);
+    btnUploadServer.addEventListener('click', sendToServerHandler);
+    newTrainingBtn.addEventListener('click', () => {
+      pptxInput.value = '';
+      logoInput.value = '';
+      slidesEl.innerHTML = '';
+      projectTitle.textContent = 'Nenhum projeto';
+      summaryEl.textContent = 'Selecione um arquivo PPTX para iniciar a extraição.';
+      statusEl.textContent = 'Aguardando arquivo .pptx';
+      downloadJson.disabled = true;
     });
 
-    document.getElementById('btnUploadServer').addEventListener('click', async ()=>{
-      const f = pptxInput.files && pptxInput.files[0];
-      if (!f){ statusEl.textContent='Selecione um arquivo PPTX antes de enviar.'; return; }
-      // prepare form data
-      const fd = new FormData();
-      fd.append('pptx', f, f.name);
-      const logo = logoInput.files && logoInput.files[0]; if (logo) fd.append('logo', logo, logo.name);
-      // add fields
-      ['name','unit','category','audience','avatar','voice','aspectRatio'].forEach(k => fd.append(k, form.elements[k].value || ''));
-      statusEl.textContent='Enviando para o servidor...';
-      try{
-        const resp = await fetch('/api/projects', { method:'POST', body: fd });
-        if (!resp.ok) throw new Error(`Servidor respondeu ${resp.status}`);
-        const body = await resp.json();
-        statusEl.textContent='Enviado e salvo no servidor (id: '+body.id+')';
-        renderProject(body.source?.filename || (f && f.name), { slides: body.slides || [], slideCount: body.slideCount || (body.slides?body.slides.length:0) });
-      }catch(err){ console.error(err); statusEl.textContent='Falha ao enviar: '+(err.message||err); }
+    downloadJson.addEventListener('click', () => {
+      const data = downloadJson._data;
+      if (!data) return;
+      const blob = new Blob([JSON.stringify(data.content, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = data.fileName;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
     });
-
-    downloadJson.addEventListener('click', ()=>{
-      const d = downloadJson._data; if (!d) return; const blob = new Blob([JSON.stringify(d.content,null,2)],{type:'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download=d.fileName; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-    });
-
-    // quick check for online server
-    async function checkServer(){ try{ const r = await fetch('/api/health'); if (r.ok) document.getElementById('uploadServer').classList.remove('btn'); }catch(e){} }
-    checkServer();
   </script>
 </body>
 </html>
