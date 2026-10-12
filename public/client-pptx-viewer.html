@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Visualizador PPTX (cliente)</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin: 20px; color:#222; }
+    header { display:flex; align-items:center; gap:16px; margin-bottom:18px; }
+    .btn { padding:8px 12px; border-radius:6px; border:1px solid #2b6cb0; background:#3182ce; color:#fff; cursor:pointer; }
+    input[type=file] { display:inline-block; }
+    #status { margin-left:12px; color:#666; font-size:0.95rem; }
+    .slides { display:grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap:12px; margin-top:18px; }
+    .slide { border:1px solid #e2e8f0; border-radius:8px; padding:12px; background:#fff; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+    .thumb { width:100%; height:160px; background:#f7fafc; display:flex; align-items:center; justify-content:center; overflow:hidden; margin-bottom:8px; }
+    .thumb img { max-width:100%; max-height:100%; display:block; }
+    .meta { font-size:0.9rem; color:#555; margin-bottom:6px; }
+    pre { white-space:pre-wrap; word-break:break-word; font-size:0.9rem; background:#f7fafc; padding:8px; border-radius:6px; border:1px solid #edf2f7; }
+    footer { margin-top:18px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Visualizador PPTX (sem servidor)</h1>
+    <div>
+      <input id="file" type="file" accept=".pptx" />
+      <button id="clear" class="btn" style="background:#4a5568;border-color:#4a5568;margin-left:8px;">Limpar</button>
+      <button id="download" class="btn" style="background:#2f855a;border-color:#2f855a;margin-left:8px;" disabled>Baixar JSON</button>
+    </div>
+    <div id="status">Aguardando arquivo .pptx</div>
+  </header>
+
+  <main>
+    <section id="info" style="margin-bottom:10px;"></section>
+    <section id="slidesContainer" class="slides" aria-live="polite"></section>
+  </main>
+
+  <footer>
+    <p style="color:#666;font-size:0.9rem">Observação: funciona inteiramente no navegador. Arquivos grandes podem demorar.</p>
+  </footer>
+
+  <!-- Dependências via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fast-xml-parser@4.5.0/dist/fast-xml-parser.min.js"></script>
+
+  <script>
+    const fileInput = document.getElementById('file');
+    const status = document.getElementById('status');
+    const slidesContainer = document.getElementById('slidesContainer');
+    const info = document.getElementById('info');
+    const clearBtn = document.getElementById('clear');
+    const downloadBtn = document.getElementById('download');
+
+    // helpers
+    const detectMime = (name) => {
+      const ext = (name || '').split('.').pop().toLowerCase();
+      return {
+        png: 'image/png',
+        jpg: 'image/jpeg',
+        jpeg: 'image/jpeg',
+        gif: 'image/gif',
+        bmp: 'image/bmp',
+        svg: 'image/svg+xml',
+        webp: 'image/webp'
+      }[ext] || 'application/octet-stream';
+    };
+
+    const arrayWrap = v => v == null ? [] : Array.isArray(v) ? v : [v];
+
+    function extractTexts(obj, out = []) {
+      if (obj == null) return out;
+      if (Array.isArray(obj)) {
+        obj.forEach(i => extractTexts(i, out));
+        return out;
+      }
+      if (typeof obj !== 'object') return out;
+      for (const [k, v] of Object.entries(obj)) {
+        // look for tags that are exactly 'a:t' or end with ':t' (namespaces)
+        if (k === 'a:t' || k.endsWith(':t')) {
+          arrayWrap(v).forEach(item => out.push(String(item)));
+        } else {
+          extractTexts(v, out);
+        }
+      }
+      return out;
+    }
+
+    function normalizeZipPath(base, target) {
+      if (!target) return '';
+      let t = decodeURIComponent(String(target)).replace(/\\/g, '/').replace(/^\//, '');
+      if (t.startsWith('ppt/')) return t;
+      // join base and t
+      const joined = base.replace(/\/$/, '') + '/' + t;
+      // simple normalization: remove ../ sequences
+      if (joined.includes('../')) {
+        if (joined.indexOf('..') === 0) throw new Error('Invalid path');
+      }
+      return joined;
+    }
+
+    async function handleFile(file) {
+      slidesContainer.innerHTML = '';
+      info.textContent = '';
+      downloadBtn.disabled = true;
+      status.textContent = 'Carregando arquivo...';
+
+      try {
+        const buffer = await file.arrayBuffer();
+        const zip = await JSZip.loadAsync(buffer);
+        const files = Object.keys(zip.files);
+
+        const slideFiles = files.filter(name => /^ppt\/slides\/slide\d+\.xml$/.test(name))
+                                .sort((a,b) => {
+                                  const na = Number(a.match(/slide(\d+)/)?.[1] || 0);
+                                  const nb = Number(b.match(/slide(\d+)/)?.[1] || 0);
+                                  return na - nb;
+                                });
+
+        if (!slideFiles.length) {
+          status.textContent = 'Nenhum slide encontrado no PPTX.';
+          return;
+        }
+
+        status.textContent = `Encontrados ${slideFiles.length} slides — processando...`;
+
+        // prepare parser
+        const XMLParser = window.fastXmlParser?.XMLParser || window.XMLParser;
+        if (!XMLParser) throw new Error('fast-xml-parser não carregado');
+        const parser = new XMLParser({ ignoreAttributes:false, attributeNamePrefix:'', trimValues:false });
+
+        const slides = [];
+
+        for (const slideFile of slideFiles) {
+          const number = Number(slideFile.match(/slide(\d+)/)?.[1] || 0);
+          const slideXml = await zip.file(slideFile).async('string');
+          const slideDoc = parser.parse(slideXml || '');
+          const paragraphs = extractTexts(slideDoc).map(t => t.replace(/\s+/g,' ').trim()).filter(Boolean);
+
+          // relationships for images/notes
+          const baseName = slideFile.split('/').pop();
+          const relPath = `ppt/slides/_rels/${baseName}.rels`;
+          const relXml = zip.file(relPath) ? await zip.file(relPath).async('string') : null;
+          const relDoc = relXml ? parser.parse(relXml) : {};
+          const relationships = arrayWrap(relDoc.Relationships?.Relationship);
+
+          const images = [];
+          for (const rel of relationships) {
+            if (!String(rel.Type || '').endsWith('/image')) continue;
+            if (rel.TargetMode === 'External') continue;
+            const target = normalizeZipPath('ppt/slides', rel.Target);
+            const imgFile = zip.file(target);
+            if (!imgFile) continue;
+            const arr = await imgFile.async('arraybuffer');
+            const blob = new Blob([arr], { type: detectMime(target) });
+            const url = URL.createObjectURL(blob);
+            images.push({ path: target, url, mime: detectMime(target) });
+          }
+
+          // notes slide (if relationship points to notesSlide)
+          let notes = '';
+          const notesRel = relationships.find(r => String(r.Type || '').endsWith('/notesSlide'));
+          if (notesRel?.Target) {
+            try {
+              const notesPath = normalizeZipPath('ppt/slides', notesRel.Target);
+              const notesXml = zip.file(notesPath) ? await zip.file(notesPath).async('string') : null;
+              if (notesXml) {
+                const notesDoc = parser.parse(notesXml);
+                notes = extractTexts(notesDoc).map(t => t.replace(/\s+/g,' ').trim()).filter(Boolean).join(' ');
+              }
+            } catch (e) {
+              // ignore
+            }
+          }
+
+          slides.push({
+            number,
+            title: paragraphs[0] || `Slide ${number}`,
+            text: paragraphs.join(' '),
+            notes,
+            images
+          });
+        }
+
+        // render
+        slidesContainer.innerHTML = '';
+        for (const s of slides) {
+          const el = document.createElement('article');
+          el.className = 'slide';
+          el.innerHTML = `
+            <div class="thumb">${s.images[0] ? `<img src="${s.images[0].url}" alt="Slide ${s.number}"/>` : '<span style="color:#999">Sem imagem</span>'}</div>
+            <div class="meta"><strong>${escapeHtml(s.title)}</strong> · Slide ${s.number}</div>
+            <div><pre>${escapeHtml(s.text || '[sem texto]')}</pre></div>
+            ${s.notes ? `<div style="margin-top:8px"><strong>Notas:</strong><pre>${escapeHtml(s.notes)}</pre></div>` : ''}
+          `;
+          slidesContainer.appendChild(el);
+        }
+
+        info.textContent = `Arquivo: ${file.name} — slides: ${slides.length}`;
+        status.textContent = 'Concluído';
+        downloadBtn.disabled = false;
+
+        // store for download
+        downloadBtn._data = { fileName: file.name.replace(/\.pptx$/i,'') + '.json', content: { file: file.name, slides } };
+
+      } catch (err) {
+        console.error(err);
+        status.textContent = 'Erro ao processar: ' + (err.message || err);
+      }
+    }
+
+    function escapeHtml(s) {
+      return String(s ?? '').replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[c]);
+    }
+
+    fileInput.addEventListener('change', (ev) => {
+      const f = ev.target.files && ev.target.files[0];
+      if (!f) return;
+      handleFile(f);
+    });
+
+    clearBtn.addEventListener('click', () => {
+      slidesContainer.innerHTML = '';
+      info.textContent = '';
+      status.textContent = 'Aguardando arquivo .pptx';
+      fileInput.value = '';
+      downloadBtn.disabled = true;
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      const data = downloadBtn._data;
+      if (!data) return;
+      const blob = new Blob([JSON.stringify(data.content, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = data.fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
