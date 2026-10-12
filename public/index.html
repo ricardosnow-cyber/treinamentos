@@ -1,1 +1,133 @@
 public/index.html
+&lt;!doctype html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+  &lt;title&gt;Studio IA de Treinamentos&lt;/title&gt;
+  &lt;style&gt;
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;header class="top"&gt;
+    &lt;div&gt;
+      &lt;h1&gt;Studio IA de Treinamentos&lt;/h1&gt;
+      &lt;p&gt;Processamento real de arquivos PPTX&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;button id="newTraining" class="btn secondary"&gt;
+    &lt;/button&gt;
+  &lt;/header&gt;
+  &lt;main class="wrap"&gt;
+    &lt;section class="card"&gt;
+      &lt;h2&gt;Novo treinamento&lt;/h2&gt;
+      &lt;form id="form"&gt;
+        &lt;div class="grid"&gt;
+          &lt;div class="field"&gt;
+            &lt;label&gt;Nome do treinamento&lt;/label&gt;
+            &lt;input
+            &gt;
+          &lt;/div&gt;
+          &lt;div class="field"&gt;
+            &lt;label&gt;Empresa ou unidade&lt;/label&gt;
+            &lt;input name="unit" value="CD-SP"&gt;
+          &lt;/div&gt;
+          &lt;div class="field"&gt;
+            &lt;label&gt;Categoria&lt;/label&gt;
+            &lt;input
+            &gt;
+          &lt;/div&gt;
+          &lt;div class="field"&gt;
+            &lt;label&gt;Público-alvo&lt;/label&gt;
+            &lt;input
+            &gt;
+          &lt;/div&gt;
+          &lt;div class="field"&gt;
+            &lt;label&gt;Avatar&lt;/label&gt;
+            &lt;input
+            &gt;
+          &lt;/div&gt;
+          &lt;div class="field"&gt;
+            &lt;label&gt;Voz&lt;/label&gt;
+            &lt;input
+            &gt;
+          &lt;/div&gt;
+          &lt;div class="field"&gt;
+            &lt;label&gt;Proporção do vídeo&lt;/label&gt;
+            &lt;input name="aspectRatio" value="16:9"&gt;
+          &lt;/div&gt;
+          &lt;div class="field"&gt;
+            &lt;label&gt;Duração máxima por vídeo&lt;/label&gt;
+            &lt;input
+            &gt;
+          &lt;/div&gt;
+          &lt;div class="field"&gt;
+            &lt;label&gt;Quantidade de vídeos&lt;/label&gt;
+            &lt;input
+            &gt;
+          &lt;/div&gt;
+          &lt;div class="field"&gt;
+            &lt;label&gt;Arquivo PPTX&lt;/label&gt;
+            &lt;input
+            &gt;
+          &lt;/div&gt;
+          &lt;div class="field"&gt;
+            &lt;label&gt;Logotipo&lt;/label&gt;
+            &lt;input
+            &gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="actions"&gt;
+          &lt;button class="btn primary" type="submit"&gt;
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/form&gt;
+      &lt;div id="status" class="status"&gt;&lt;/div&gt;
+    &lt;/section&gt;
+    &lt;section id="result" class="card" hidden&gt;
+      &lt;h2 id="projectTitle"&gt;&lt;/h2&gt;
+      &lt;p id="summary" class="muted"&gt;&lt;/p&gt;
+      &lt;p class="muted"&gt;
+      &lt;/p&gt;
+      &lt;div id="slides" class="slides"&gt;&lt;/div&gt;
+      &lt;div class="actions"&gt;
+        &lt;button id="save" class="btn primary"&gt;
+        &lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+  &lt;/main&gt;
+  &lt;script&gt;
+    const escapeHtml = value =&gt; String(value ?? '').replace(/[&&lt;&gt;"']/g, char =&gt; ({
+      '&': '&amp;',
+      '&lt;': '&lt;',
+      '&gt;': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+      document.querySelectorAll('.slide').forEach(card =&gt; {
+      slidesBox.innerHTML = project.slides.map((slide, index) =&gt; `
+        &lt;article class="slide" draggable="true" data-index="${index}"&gt;
+          &lt;div&gt;
+            &lt;div class="thumb"&gt;
+                ? `&lt;img src="${slide.thumbnail}" alt="Miniatura do slide ${slide.number}"&gt;`
+            &lt;/div&gt;
+            &lt;span class="tag"&gt;Slide ${slide.number}&lt;/span&gt;
+            &lt;span class="status-tag"&gt;${escapeHtml(slide.validationStatus || 'REVISAR')}&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;div&gt;
+            &lt;strong&gt;${escapeHtml(slide.title)}&lt;/strong&gt;
+            &lt;textarea
+            &gt;${escapeHtml(slide.text)}&lt;/textarea&gt;
+            &lt;textarea
+            &gt;${escapeHtml(slide.notes)}&lt;/textarea&gt;
+          &lt;/div&gt;
+        &lt;/article&gt;
+      document.querySelectorAll('.slide').forEach(card =&gt; {
+        card.addEventListener('dragstart', () =&gt; {
+        card.addEventListener('dragend', () =&gt; {
+        card.addEventListener('dragover', event =&gt; {
+        card.addEventListener('drop', event =&gt; {
+    form.addEventListener('submit', async event =&gt; {
+    document.querySelector('#save').addEventListener('click', async () =&gt; {
+    document.querySelector('#newTraining').addEventListener('click', () =&gt; {
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
