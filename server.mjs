@@ -10,7 +10,12 @@ import { randomUUID } from "node:crypto";
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.join(ROOT, "public");
 const STORAGE_DIR = path.join(ROOT, "storage");
+const COSTS_FILE = path.join(STORAGE_DIR, "costs.json");
+const DAILY_COST_LIMIT_USD = 5;
+const COST_TIME_ZONE = process.env.COST_TIME_ZONE || "America/Sao_Paulo";
+const COST_RATES = { heygen: 0.05, "openai-image": 0.04, "heygen-ghibli": 0.05 };
 await fs.mkdir(STORAGE_DIR, { recursive: true });
+try { await fs.access(COSTS_FILE); } catch { await fs.writeFile(COSTS_FILE, "[]", "utf8"); }
 const app = express();
 const port = process.env.PORT || 3000;
 const parser = new XMLParser({
@@ -142,6 +147,97 @@ async function parsePptx(buffer) {
     }
   };
 }
+
+function dateKeyInTimeZone(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: COST_TIME_ZONE, year: "numeric", month: "2-digit", day: "2-digit"
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
+  return [values.year, values.month, values.day].join("-");
+}
+async function readCostEntries() {
+  try {
+    const parsed = JSON.parse(await fs.readFile(COSTS_FILE, "utf8"));
+    return Array.isArray(parsed) ? parsed : [];
+  } catch { return []; }
+}
+let costWriteQueue = Promise.resolve();
+function persistCostEntries(entries) {
+  costWriteQueue = costWriteQueue.then(() =>
+    fs.writeFile(COSTS_FILE, JSON.stringify(entries.slice(-5000), null, 2), "utf8")
+  );
+  return costWriteQueue;
+}
+function costFor(provider, durationSeconds, imageCount) {
+  const duration = Math.max(0, Math.min(3600, Number(durationSeconds) || 0));
+  const images = Math.max(0, Math.min(100, Math.floor(Number(imageCount) || 0)));
+  const imageCostUSD = provider === "openai-image" || provider === "heygen-ghibli"
+    ? images * COST_RATES["openai-image"] : 0;
+  const videoCostUSD = provider === "heygen" || provider === "heygen-ghibli"
+    ? duration * COST_RATES.heygen : 0;
+  return {
+    durationSeconds: duration, imageCount: images,
+    imageCostUSD: Number(imageCostUSD.toFixed(4)),
+    videoCostUSD: Number(videoCostUSD.toFixed(4)),
+    costUSD: Number((imageCostUSD + videoCostUSD).toFixed(4))
+  };
+}
+function summarizeCosts(entries) {
+  const todayKey = dateKeyInTimeZone();
+  const todayEntries = entries.filter(entry => dateKeyInTimeZone(new Date(entry.timestamp)) === todayKey);
+  const todayCostUSD = Number(todayEntries.reduce((sum, entry) => sum + entry.costUSD, 0).toFixed(4));
+  const totalCostUSD = Number(entries.reduce((sum, entry) => sum + entry.costUSD, 0).toFixed(4));
+  const byDayMap = new Map();
+  for (const entry of entries) {
+    const day = dateKeyInTimeZone(new Date(entry.timestamp));
+    byDayMap.set(day, (byDayMap.get(day) || 0) + entry.costUSD);
+  }
+  const byDay = [...byDayMap.entries()].sort(([a], [b]) => a.localeCompare(b)).slice(-7)
+    .map(([date, costUSD]) => ({ date, costUSD: Number(costUSD.toFixed(4)) }));
+  return {
+    totalCostUSD, todayCostUSD, dailyLimitUSD: DAILY_COST_LIMIT_USD,
+    dailyLimitExceeded: todayCostUSD > DAILY_COST_LIMIT_USD,
+    timezone: COST_TIME_ZONE, byDay
+  };
+}
+app.get("/custos", (req, res) => res.sendFile(path.join(PUBLIC_DIR, "custos.html")));
+app.get("/api/costs", async (req, res, next) => {
+  try {
+    const entries = await readCostEntries();
+    res.json({ entries: entries.slice(-500).reverse(), summary: summarizeCosts(entries) });
+  } catch (error) { next(error); }
+});
+app.post("/api/costs", async (req, res, next) => {
+  try {
+    const provider = String(req.body?.provider || "");
+    if (!Object.hasOwn(COST_RATES, provider)) {
+      return res.status(400).json({ error: "Provedor inválido. Use heygen, openai-image ou heygen-ghibli." });
+    }
+    const prompt = String(req.body?.prompt || "").slice(0, 5000);
+    const requestId = String(req.body?.requestId || "").slice(0, 120);
+    const entries = await readCostEntries();
+    if (requestId) {
+      const duplicate = entries.find(entry => entry.requestId === requestId);
+      if (duplicate) return res.status(200).json({ entry: duplicate, summary: summarizeCosts(entries), duplicate: true });
+    }
+    const estimate = costFor(provider, req.body?.durationSeconds, provider === "heygen" ? 0 : (req.body?.imageCount ?? 1));
+    if (estimate.costUSD <= 0) {
+      return res.status(400).json({ error: "Informe duração maior que zero para vídeo ou quantidade de imagens maior que zero." });
+    }
+    const entry = {
+      id: randomUUID(), timestamp: new Date().toISOString(), provider,
+      label: String(req.body?.label || "").slice(0, 160),
+      prompt, requestId: requestId || null,
+      videoId: String(req.body?.videoId || "").slice(0, 200) || null,
+      status: String(req.body?.status || "estimated").slice(0, 40),
+      ...estimate
+    };
+    entries.push(entry);
+    await persistCostEntries(entries);
+    res.status(201).json({ entry, summary: summarizeCosts(entries), duplicate: false });
+  } catch (error) { next(error); }
+});
+
 app.get("/api/health", (req, res) => {
   res.json({ ok: true, service: "studio-ia-treinamentos" });
 });
