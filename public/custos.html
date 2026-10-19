@@ -30,7 +30,8 @@ main{width:min(1160px,calc(100% - 32px));margin:28px auto 56px}.top{display:flex
 <button class="btn" id="generateBtn" type="submit">Enviar para geração no HeyGen</button>
 <div id="videoResult" class="video-result" hidden role="status" aria-live="polite"></div>
 </form></section>
-\n<section class="layout">
+
+<section class="layout">
 <div class="panel"><h2>Registrar uso de IA</h2><p class="muted" style="margin-top:-8px;font-size:13px">Registre um consumo ou uma estimativa. O servidor calcula o valor com base nas tarifas configuradas.</p>
 <form id="costForm">
 <div class="field"><label for="provider">Provedor / operação</label><select id="provider" name="provider"><option value="heygen-ghibli">HeyGen + imagem (fluxo completo)</option><option value="heygen">HeyGen — vídeo</option><option value="openai-image">OpenAI Image — imagem</option></select></div>
@@ -104,7 +105,8 @@ $('videoForm').addEventListener('submit', async event => {
     toast(result.textContent);
   } finally {btn.disabled=false;btn.textContent='Enviar para geração no HeyGen';}
 });
-\nestimate();refresh().catch(error=>{toast(error.message);$('history').innerHTML='<tr><td colspan="7" class="empty">Falha ao carregar os custos.</td></tr>';});
+
+estimate();refresh().catch(error=>{toast(error.message);$('history').innerHTML='<tr><td colspan="7" class="empty">Falha ao carregar os custos.</td></tr>';});
 </script>
 </body>
 </html>
