@@ -30,6 +30,11 @@ const parser = new XMLParser({
 // This app serves its own frontend; do not enable wildcard cross-origin API access.
 // Wildcard CORS is intentionally disabled to reduce cross-site API exposure.
 app.use(express.json({ limit: "25mb" }));
+// Serve the protected cost dashboard only through /custos, which enforces admin authentication.
+app.use((req, res, next) => {
+  if (req.path === "/custos.html") return res.status(404).end();
+  next();
+});
 app.use(express.static(PUBLIC_DIR));
 app.use("/storage", express.static(STORAGE_DIR));
 const upload = multer({
