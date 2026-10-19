@@ -8,7 +8,7 @@
 :root{color-scheme:dark;--bg:#0b1020;--panel:#131b2f;--panel2:#18233b;--line:#2b3855;--text:#f2f5fc;--muted:#a5b2ca;--accent:#83a7ff;--good:#63d6a0;--warn:#ffbf69;--danger:#ff7e87}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top right,#1c2b4a 0,transparent 40%),var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
 main{width:min(1160px,calc(100% - 32px));margin:28px auto 56px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}.eyebrow{color:var(--accent);font-size:12px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}h1{font-size:clamp(26px,4vw,38px);line-height:1.1;margin:7px 0}h2{font-size:18px;margin:0 0 16px}.muted{color:var(--muted)}.back{color:var(--text);border:1px solid var(--line);padding:10px 14px;border-radius:11px;text-decoration:none;white-space:nowrap}
-.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:16px}.panel,.metric{background:linear-gradient(150deg,rgba(24,35,59,.97),rgba(17,25,43,.97));border:1px solid var(--line);border-radius:17px;padding:20px;min-width:0}.metric-label{font-size:13px;color:var(--muted)}.metric-value{font-size:clamp(25px,4vw,34px);font-weight:800;letter-spacing:-.04em;margin:8px 0 4px}.metric-note{font-size:12px;color:var(--muted)}.layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:16px;margin-bottom:16px}.field{display:grid;gap:6px;margin-bottom:13px}label{font-size:13px;color:var(--muted)}input,select,textarea{width:100%;font:inherit;color:var(--text);background:#0c1427;border:1px solid var(--line);border-radius:10px;padding:11px 12px;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--accent)}textarea{min-height:76px;resize:vertical}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.estimate{display:flex;justify-content:space-between;gap:12px;align-items:center;background:#0d162a;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0 16px}.estimate strong{font-size:19px}.btn{border:0;background:var(--accent);color:#10182a;font-weight:800;padding:12px 16px;border-radius:11px;cursor:pointer;width:100%}.btn:disabled{opacity:.55;cursor:wait}.rate-list{display:grid;gap:10px}.rate{display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid var(--line);padding-bottom:10px}.rate:last-child{border:0;padding:0}.rate strong{white-space:nowrap}.chart{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;align-items:end;min-height:190px;padding-top:12px}.day{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:8px;height:175px;min-width:0}.bar-wrap{height:132px;display:flex;align-items:flex-end;width:100%;justify-content:center}.bar{width:min(34px,75%);min-height:3px;background:linear-gradient(180deg,#9bb9ff,#5f82df);border-radius:7px 7px 3px 3px}.day-value{font-size:10px;color:var(--muted);white-space:nowrap}.day-label{font-size:11px;color:var(--muted)}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:660px}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);font-size:13px}th{color:var(--muted);font-weight:600}td.cost{font-weight:800;white-space:nowrap}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#263654;color:#c6d6ff;font-size:11px}.empty{padding:25px;text-align:center;color:var(--muted)}.toast{position:fixed;right:20px;bottom:20px;max-width:calc(100% - 40px);padding:14px 18px;background:#4a2028;border:1px solid #a74655;color:#fff;border-radius:12px;box-shadow:0 12px 40px #0007;z-index:10;opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s}.toast.show{opacity:1;transform:translateY(0)}.toast.ok{background:#153b30;border-color:#32785f}.warning{color:var(--warn)}.limit{color:var(--danger)}footer{margin-top:16px;font-size:12px;color:var(--muted)}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:16px}.panel,.metric{background:linear-gradient(150deg,rgba(24,35,59,.97),rgba(17,25,43,.97));border:1px solid var(--line);border-radius:17px;padding:20px;min-width:0}.metric-label{font-size:13px;color:var(--muted)}.metric-value{font-size:clamp(25px,4vw,34px);font-weight:800;letter-spacing:-.04em;margin:8px 0 4px}.metric-note{font-size:12px;color:var(--muted)}.layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:16px;margin-bottom:16px}.field{display:grid;gap:6px;margin-bottom:13px}label{font-size:13px;color:var(--muted)}input,select,textarea{width:100%;font:inherit;color:var(--text);background:#0c1427;border:1px solid var(--line);border-radius:10px;padding:11px 12px;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--accent)}textarea{min-height:76px;resize:vertical}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.estimate{display:flex;justify-content:space-between;gap:12px;align-items:center;background:#0d162a;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0 16px}.estimate strong{font-size:19px}.btn{border:0;background:var(--accent);color:#10182a;font-weight:800;padding:12px 16px;border-radius:11px;cursor:pointer;width:100%}.btn:disabled{opacity:.55;cursor:wait}.rate-list{display:grid;gap:10px}.rate{display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid var(--line);padding-bottom:10px}.rate:last-child{border:0;padding:0}.rate strong{white-space:nowrap}.chart{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;align-items:end;min-height:190px;padding-top:12px}.day{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:8px;height:175px;min-width:0}.bar-wrap{height:132px;display:flex;align-items:flex-end;width:100%;justify-content:center}.bar{width:min(34px,75%);min-height:3px;background:linear-gradient(180deg,#9bb9ff,#5f82df);border-radius:7px 7px 3px 3px}.day-value{font-size:10px;color:var(--muted);white-space:nowrap}.day-label{font-size:11px;color:var(--muted)}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:660px}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);font-size:13px}th{color:var(--muted);font-weight:600}td.cost{font-weight:800;white-space:nowrap}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#263654;color:#c6d6ff;font-size:11px}.empty{padding:25px;text-align:center;color:var(--muted)}.toast{position:fixed;right:20px;bottom:20px;max-width:calc(100% - 40px);padding:14px 18px;background:#4a2028;border:1px solid #a74655;color:#fff;border-radius:12px;box-shadow:0 12px 40px #0007;z-index:10;opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s}.toast.show{opacity:1;transform:translateY(0)}.toast.ok{background:#153b30;border-color:#32785f}.warning{color:var(--warn)}.limit{color:var(--danger)}footer{margin-top:16px;font-size:12px;color:var(--muted)}.video-result{margin-top:14px;padding:12px;border-radius:11px;border:1px solid var(--line);background:#0c1427}.video-result a{color:var(--accent)}
 @media(max-width:800px){.layout{grid-template-columns:1fr}.metrics{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}.back{align-self:flex-start}}@media(max-width:440px){main{width:min(100% - 20px,1160px);margin-top:18px}.panel,.metric{padding:15px}.formgrid{grid-template-columns:1fr}.chart{gap:4px}}
 </style>
 </head>
@@ -20,7 +20,17 @@ main{width:min(1160px,calc(100% - 32px));margin:28px auto 56px}.top{display:flex
 <div class="metric"><div class="metric-label">Gasto de hoje</div><div class="metric-value" id="todayCost">US$ 0,00</div><div class="metric-note" id="dailyNote">Limite diário: US$ 5,00</div></div>
 <div class="metric"><div class="metric-label">Orçamento diário restante</div><div class="metric-value" id="remainingCost">US$ 5,00</div><div class="metric-note">Fuso horário: America/Sao_Paulo</div></div>
 </section>
-<section class="layout">
+
+<section class="panel" style="margin-bottom:16px"><h2>Gerar vídeo com avatar HeyGen</h2><p class="muted" style="margin-top:-8px;font-size:13px">A chave do HeyGen fica somente no servidor. Se avatar e voz estiverem definidos nas variáveis de ambiente, deixe os campos abaixo vazios.</p>
+<form id="videoForm">
+<div class="field"><label for="videoTitle">Título do vídeo</label><input id="videoTitle" maxlength="200" placeholder="Treinamento de segurança"></div>
+<div class="formgrid"><div class="field"><label for="avatarId">Avatar ID (opcional)</label><input id="avatarId" maxlength="200" placeholder="Usar HEYGEN_AVATAR_ID"></div><div class="field"><label for="voiceId">Voice ID (opcional)</label><input id="voiceId" maxlength="200" placeholder="Usar HEYGEN_VOICE_ID"></div></div>
+<div class="formgrid"><div class="field"><label for="videoRatio">Formato</label><select id="videoRatio"><option value="16:9">16:9 — paisagem</option><option value="9:16">9:16 — vertical</option><option value="1:1">1:1 — quadrado</option></select></div><div class="field"><label for="videoDuration">Duração estimada em segundos (opcional)</label><input id="videoDuration" type="number" min="1" max="3600" placeholder="Estimativa pelo texto"></div></div>
+<div class="field"><label for="videoScript">Roteiro da narração</label><textarea id="videoScript" required maxlength="10000" style="min-height:130px" placeholder="Cole o texto que o avatar deve narrar…"></textarea></div>
+<button class="btn" id="generateBtn" type="submit">Enviar para geração no HeyGen</button>
+<div id="videoResult" class="video-result" hidden role="status" aria-live="polite"></div>
+</form></section>
+\n<section class="layout">
 <div class="panel"><h2>Registrar uso de IA</h2><p class="muted" style="margin-top:-8px;font-size:13px">Registre um consumo ou uma estimativa. O servidor calcula o valor com base nas tarifas configuradas.</p>
 <form id="costForm">
 <div class="field"><label for="provider">Provedor / operação</label><select id="provider" name="provider"><option value="heygen-ghibli">HeyGen + imagem (fluxo completo)</option><option value="heygen">HeyGen — vídeo</option><option value="openai-image">OpenAI Image — imagem</option></select></div>
@@ -51,7 +61,50 @@ function render(data){const s=data.summary;$('totalCost').textContent=money(s.to
 async function refresh(){const response=await fetch('/api/costs');if(!response.ok)throw new Error('Não foi possível carregar o histórico.');render(await response.json());}
 $('provider').addEventListener('change',estimate);$('duration').addEventListener('input',estimate);$('images').addEventListener('input',estimate);
 $('costForm').addEventListener('submit',async event=>{event.preventDefault();const btn=$('submitBtn');btn.disabled=true;btn.textContent='Salvando…';try{const provider=selectedProvider();const payload={provider,durationSeconds:Number($('duration').value)||0,imageCount:Number($('images').value)||0,label:$('label').value,prompt:$('prompt').value,requestId:crypto.randomUUID(),status:'estimated'};const response=await fetch('/api/costs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await response.json();if(!response.ok)throw new Error(data.error||'Falha ao registrar custo.');render(data);toast('Custo registrado com sucesso.','ok');$('prompt').value='';}catch(error){toast(error.message||'Erro ao registrar custo.');}finally{btn.disabled=false;btn.textContent='Registrar custo';}});
-estimate();refresh().catch(error=>{toast(error.message);$('history').innerHTML='<tr><td colspan="7" class="empty">Falha ao carregar os custos.</td></tr>';});
+
+$('videoForm').addEventListener('submit', async event => {
+  event.preventDefault();
+  const btn=$('generateBtn'), result=$('videoResult');
+  btn.disabled=true;btn.textContent='Enviando ao HeyGen…';result.hidden=false;
+  result.textContent='Solicitando geração…';
+  try {
+    const requestId=crypto.randomUUID();
+    const payload={
+      requestId,
+      title:$('videoTitle').value.trim()||'Treinamento Treinamenos',
+      script:$('videoScript').value.trim(),
+      avatar_id:$('avatarId').value.trim()||undefined,
+      voice_id:$('voiceId').value.trim()||undefined,
+      aspect_ratio:$('videoRatio').value,
+      estimated_duration:$('videoDuration').value?Number($('videoDuration').value):undefined
+    };
+    const response=await fetch('/api/heygen-ghibli',{method:'POST',headers:{'Content-Type':'application/json','Idempotency-Key':requestId},body:JSON.stringify(payload)});
+    const data=await response.json();
+    if(!response.ok)throw new Error(data.error||'Não foi possível iniciar a geração.');
+    result.textContent='Vídeo enviado ao HeyGen. ID: '+data.videoId+' · custo estimado: '+money(data.estimatedCostUSD||0)+'. Aguardando processamento…';
+    await refresh().catch(()=>{});
+    let finished=false;
+    for(let attempt=0;attempt<60;attempt++){
+      await new Promise(resolve=>setTimeout(resolve,5000));
+      const statusResponse=await fetch('/api/heygen-ghibli/'+encodeURIComponent(data.videoId));
+      const statusData=await statusResponse.json();
+      if(!statusResponse.ok)throw new Error(statusData.error||'Falha ao consultar o status do vídeo.');
+      result.textContent='Status: '+statusData.status+' · custo '+(statusData.estimated?'estimado: ':'atualizado: ')+money(statusData.costUSD||0);
+      if(statusData.videoUrl){
+        const link=document.createElement('a');link.href=statusData.videoUrl;link.target='_blank';link.rel='noopener noreferrer';link.textContent='Abrir vídeo gerado';
+        result.appendChild(document.createTextNode(' · '));result.appendChild(link);
+      }
+      await refresh().catch(()=>{});
+      if(['completed','success','failed','error'].includes(String(statusData.status).toLowerCase())){finished=true;if(['failed','error'].includes(String(statusData.status).toLowerCase()))throw new Error('A geração falhou no HeyGen. Consulte os detalhes na sua conta HeyGen.');break;}
+    }
+    if(!finished)result.appendChild(document.createTextNode(' A geração ainda está em andamento; atualize a página e consulte novamente pelo histórico.'));
+    else toast('Vídeo concluído. Custos atualizados.','ok');
+  } catch(error) {
+    result.textContent=error.message||'Erro durante a geração.';
+    toast(result.textContent);
+  } finally {btn.disabled=false;btn.textContent='Enviar para geração no HeyGen';}
+});
+\nestimate();refresh().catch(error=>{toast(error.message);$('history').innerHTML='<tr><td colspan="7" class="empty">Falha ao carregar os custos.</td></tr>';});
 </script>
 </body>
 </html>
