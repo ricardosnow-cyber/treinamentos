@@ -1,5 +1,4 @@
 import express from "express";
-import cors from "cors";
 import multer from "multer";
 import JSZip from "jszip";
 import { XMLParser } from "fast-xml-parser";
@@ -29,7 +28,7 @@ const parser = new XMLParser({
   trimValues: false
 });
 // This app serves its own frontend; do not enable wildcard cross-origin API access.
-// app.use(cors()) is intentionally disabled to reduce cross-site API exposure.
+// Wildcard CORS is intentionally disabled to reduce cross-site API exposure.
 app.use(express.json({ limit: "25mb" }));
 app.use(express.static(PUBLIC_DIR));
 app.use("/storage", express.static(STORAGE_DIR));
@@ -217,7 +216,7 @@ function requireAdmin(req, res, next) {
     return res.status(503).json({ error: "Acesso administrativo não configurado. Defina ADMIN_USER e ADMIN_PASSWORD no servidor." });
   }
   const header = req.get("authorization") || "";
-  const match = header.match(/^Basic\\s+(.+)$/i);
+  const match = header.match(/^Basic\s+(.+)$/i);
   if (!match) {
     res.set("WWW-Authenticate", 'Basic realm="Treinamenos - Administração", charset="UTF-8"');
     return res.status(401).json({ error: "Autenticação necessária." });
@@ -350,7 +349,7 @@ app.put("/api/projects/:id", async (req, res, next) => {
 
 const inFlightVideoRequests = new Map();
 function estimateSpokenDuration(text) {
-  const words = String(text || "").trim().split(/\\s+/).filter(Boolean).length;
+  const words = String(text || "").trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.min(3600, Math.ceil(words / 2.5)));
 }
 async function heygenRequest(url, options = {}) {
