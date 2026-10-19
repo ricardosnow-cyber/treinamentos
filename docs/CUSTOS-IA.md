@@ -1,32 +1,49 @@
-# Controle de custos de IA
+# Controle de custos e geração HeyGen
 
-## Rotas
-- `GET /api/costs`: devolve até 500 registros recentes e o resumo financeiro.
-- `POST /api/costs`: registra um consumo/estimativa. O backend calcula os custos e ignora qualquer total enviado pelo cliente.
-- `GET /custos`: abre o painel de custos.
+## Rotas protegidas
+Todas as rotas abaixo exigem HTTP Basic Auth, configurado com `ADMIN_USER` e `ADMIN_PASSWORD` no servidor:
+- `GET /custos`: painel de custos e geração de vídeos.
+- `GET /api/costs`: até 500 lançamentos recentes e resumo financeiro.
+- `POST /api/costs`: registra estimativas de custos (não aceita o custo calculado pelo cliente como fonte de verdade).
+- `POST /api/heygen-ghibli` e `POST /api/videos/generate`: envia um roteiro ao HeyGen e registra o custo estimado automaticamente.
+- `GET /api/heygen-ghibli/:videoId`: consulta status, link do vídeo e atualiza o custo quando a duração real for disponibilizada.
 
-## Tarifas configuradas
+Sem `ADMIN_USER` e `ADMIN_PASSWORD`, as rotas administrativas respondem HTTP 503. As credenciais e a chave do provedor não devem ser colocadas no HTML, no frontend, no Git ou em variáveis públicas de build. O servidor usa `HEYGEN_API_KEY` no cabeçalho `X-Api-Key`.
+
+## Variáveis de ambiente
+Configure no ambiente do servidor (não comite valores reais):
+- `ADMIN_USER`: usuário administrativo.
+- `ADMIN_PASSWORD`: senha administrativa forte e única.
+- `HEYGEN_API_KEY`: chave privada da API HeyGen.
+- `HEYGEN_AVATAR_ID`: avatar padrão (opcional se informado por requisição).
+- `HEYGEN_VOICE_ID`: voz padrão (opcional se informada por requisição).
+- `COST_TIME_ZONE=America/Sao_Paulo`: fuso de agrupamento do limite diário.
+
+A autenticação usa Basic Auth via HTTPS. Não publique este serviço sem HTTPS, credenciais fortes e armazenamento persistente. O Basic Auth é um controle simples para o painel administrativo; para múltiplos usuários ou uma plataforma pública, prefira sessões com MFA ou um provedor de identidade.
+
+## Tarifas e estimativas
 - `heygen`: US$ 0,05 por segundo de vídeo.
 - `openai-image`: US$ 0,04 por imagem.
 - `heygen-ghibli`: combinação de US$ 0,04 por imagem mais US$ 0,05 por segundo de vídeo.
 
-Exemplo de payload para registrar o fluxo combinado:
+A geração HeyGen estima a duração a partir do roteiro (aprox. 2,5 palavras por segundo) ou usa `estimated_duration`. O valor inicial é estimado; quando o status do HeyGen retornar a duração real, o registro é atualizado. Se a geração falhar, o custo estimado desse lançamento é zerado. Valores são estimativas configuradas e não substituem a fatura real do provedor.
+
+Exemplo:
 ```json
 {
-  "provider": "heygen-ghibli",
-  "durationSeconds": 30,
-  "imageCount": 1,
-  "label": "Treinamento NR",
-  "prompt": "Descrição do vídeo",
   "requestId": "id-unico-da-geracao",
-  "videoId": "id-do-video",
-  "status": "estimated"
+  "title": "Treinamento NR",
+  "script": "Texto da narração do avatar.",
+  "avatar_id": "ID_DO_AVATAR",
+  "voice_id": "ID_DA_VOZ",
+  "aspect_ratio": "16:9",
+  "estimated_duration": 30
 }
 ```
-O custo calculado para 30 segundos é US$ 1,54. Para evitar duplicidade em tentativas repetidas, envie o mesmo `requestId` para a mesma geração.
+Envie `requestId` também no cabeçalho `Idempotency-Key` para que repetições do mesmo pedido possam ser reconhecidas. O servidor não retorna a chave de API ao navegador.
 
-## Persistência e limite diário
-Os registros ficam em `storage/costs.json`, com retenção dos últimos 5.000 lançamentos. O limite de alerta é US$ 5/dia, calculado no fuso `COST_TIME_ZONE` (padrão `America/Sao_Paulo`). O painel exibe o toast **“Limite diário atingido”** quando o total diário ultrapassa US$ 5. O alerta não bloqueia operações.
+## Limite e persistência
+Os lançamentos ficam em `storage/costs.json`, com retenção dos últimos 5.000 registros. O alerta é US$ 5/dia no fuso configurado. O painel mostra “Limite diário atingido” após ultrapassar o valor; o alerta não bloqueia geração. Em hospedagens efêmeras, o arquivo pode ser apagado durante redeploy/restart, portanto configure volume persistente ou banco de dados antes de produção.
 
-## Importante antes de produção
-O repositório original não tinha uma rota de geração `/api/heygen-ghibli`, autenticação nem banco de dados. Este commit acrescenta o ledger de custos e sua API; para contabilizar automaticamente vídeos reais, a futura rota de geração deve chamar o registro de custo no backend usando o `requestId` da geração, e atualizar a estimativa quando a duração real for conhecida. O painel não deve ser considerado prova de custos faturados pelo provedor. A API de escrita também deve ser protegida com autenticação/autorização antes de expor o app publicamente; armazenamento em arquivo pode não ser persistente em hospedagens efêmeras.
+## Escopo
+O endpoint gera vídeo de avatar HeyGen a partir de um roteiro. Ele não gera automaticamente imagens de fundo via OpenAI; essa integração exige uma etapa separada de geração e hospedagem segura da imagem. A API de geração HeyGen utilizada é `POST https://api.heygen.com/v2/video/generate`; o status é consultado via `GET https://api.heygen.com/v1/video_status.get?video_id=...`.
